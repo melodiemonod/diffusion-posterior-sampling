@@ -91,6 +91,8 @@ def main():
     for i, ref_img in enumerate(loader):
         logger.info(f"Inference for image {i}")
         ref_img = ref_img.to(device)
+        operator.seed = 42
+        noiser.seed = 42
 
         # Exception) In case of inpainging,
         if measure_config['operator'] ['name'] == 'inpainting':
@@ -105,8 +107,8 @@ def main():
 
         else: 
             # Forward measurement model (Ax + n)
-            y = operator.forward(ref_img, seed = 42)
-            y_n = noiser(y, seed = 42)
+            y = operator.forward(ref_img)
+            y_n = noiser(y)
          
         # Sampling
         x_start = torch.randn(ref_img.shape, device=device).requires_grad_()
@@ -135,6 +137,6 @@ if __name__ == '__main__':
         "script.py",
         "--model_config", "configs/imagenet_model_config.yaml",
         "--diffusion_config", "configs/diffusion_config.yaml",
-        "--task_config", "configs/gaussian_deblur_config.yaml"
+        "--task_config", "configs/motion_deblur_config.yaml"
     ]
     main()

@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 from functools import partial
-from torch import seed
 import yaml
 from torch.nn import functional as F
 from torchvision import torch
@@ -120,9 +119,9 @@ class MotionBlurOperator(LinearOperator):
         self.kernel_size = kernel_size
         self.intensity =intensity
     
-    def forward(self, data, seed, **kwargs):
+    def forward(self, data, **kwargs):
         # A^T * A 
-        with temp_seed(seed, self.device): # fix random seed for motion blur
+        with temp_seed(self.seed, self.device): # fix random seed for motion blur
             self.conv = Blurkernel(blur_type='motion',
                             kernel_size=self.kernel_size,
                             std=self.intensity,
@@ -221,8 +220,8 @@ class NonlinearBlurOperator(NonLinearOperator):
         blur_model = blur_model.to(self.device)
         return blur_model
     
-    def forward(self, data, seed, **kwargs):
-        with temp_seed(seed, self.device):
+    def forward(self, data, **kwargs):
+        with temp_seed(self.seed, self.device):
             random_kernel = torch.randn(1, 512, 2, 2).to(self.device) * 1.2
         data = (data + 1.0) / 2.0  #[-1, 1] -> [0, 1]
         blurred = self.blur_model.adaptKernel(data, kernel=random_kernel)
@@ -252,16 +251,16 @@ def get_noise(name: str, **kwargs):
     return noiser
 
 class Noise(ABC):
-    def __call__(self, data, seed=None):
-        return self.forward(data, seed=seed)
+    def __call__(self, data):
+        return self.forward(data)
     
     @abstractmethod
-    def forward(self, data, seed=None):
+    def forward(self, data):
         pass
 
 @register_noise(name='clean')
 class Clean(Noise):
-    def forward(self, data, seed=None):
+    def forward(self, data):
         return data
 
 @register_noise(name='gaussian')
@@ -269,8 +268,8 @@ class GaussianNoise(Noise):
     def __init__(self, sigma):
         self.sigma = sigma
     
-    def forward(self, data, seed):
-        with temp_seed(seed, data.device):
+    def forward(self, data):
+        with temp_seed(self.seed, data.device):
             noise = torch.randn_like(data, device=data.device) * self.sigma
         return data + noise
 
@@ -280,7 +279,7 @@ class PoissonNoise(Noise):
     def __init__(self, rate):
         self.rate = rate
 
-    def forward(self, data, seed):
+    def forward(self, data):
         '''
         Follow skimage.util.random_noise.
         '''
@@ -293,7 +292,7 @@ class PoissonNoise(Noise):
         data = data.clamp(0, 1)
         device = data.device
         data = data.detach().cpu()
-        with temp_seed(seed, device):
+        with temp_seed(self.seed, device):
             data = torch.from_numpy(np.random.poisson(data * 255.0 * self.rate) / 255.0 / self.rate)
         data = data * 2.0 - 1.0
         data = data.clamp(-1, 1)
