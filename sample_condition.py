@@ -30,6 +30,8 @@ def main():
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--save_dir', type=str, default='./results')
     args = parser.parse_args()
+    
+    print("save_dir: ", args.save_dir)
    
     # logger
     logger = get_logger()
@@ -131,12 +133,4 @@ def main():
         plt.imsave(os.path.join(out_path, 'recon', fname), recon_arr)
 
 if __name__ == '__main__':
-    import sys
-    
-    sys.argv = [
-        "script.py",
-        "--model_config", "configs/imagenet_model_config.yaml",
-        "--diffusion_config", "configs/diffusion_config.yaml",
-        "--task_config", "configs/motion_deblur_config.yaml"
-    ]
     main()
