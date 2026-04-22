@@ -1,6 +1,7 @@
 from functools import partial
 import os
 import argparse
+import time
 import yaml
 import numpy as np
 import torch
@@ -91,6 +92,7 @@ def main():
         
     # Do Inference
     for i, ref_img in enumerate(loader):
+        start_time = time.time()
         logger.info(f"Inference for image {i}")
         ref_img = ref_img.to(device)
         operator.seed = 42
@@ -132,5 +134,9 @@ def main():
         plt.imsave(os.path.join(out_path, 'label', fname), label_arr)
         plt.imsave(os.path.join(out_path, 'recon', fname), recon_arr)
 
+        end_time = time.time()
+        elapsed = end_time - start_time
+        print(f"Time per image {i}: {elapsed:.2f} sec")
+    
 if __name__ == '__main__':
     main()
