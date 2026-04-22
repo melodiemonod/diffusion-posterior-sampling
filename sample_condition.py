@@ -2,7 +2,7 @@ from functools import partial
 import os
 import argparse
 import yaml
-
+import numpy as np
 import torch
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
@@ -90,7 +90,6 @@ def main():
     # Do Inference
     for i, ref_img in enumerate(loader):
         logger.info(f"Inference for image {i}")
-        fname = str(i).zfill(5) + '.png'
         ref_img = ref_img.to(device)
 
         # Exception) In case of inpainging,
@@ -106,16 +105,36 @@ def main():
 
         else: 
             # Forward measurement model (Ax + n)
-            y = operator.forward(ref_img)
-            y_n = noiser(y)
+            y = operator.forward(ref_img, seed = 42)
+            y_n = noiser(y, seed = 42)
          
         # Sampling
         x_start = torch.randn(ref_img.shape, device=device).requires_grad_()
         sample = sample_fn(x_start=x_start, measurement=y_n, record=True, save_root=out_path)
 
-        plt.imsave(os.path.join(out_path, 'input', fname), clear_color(y_n))
-        plt.imsave(os.path.join(out_path, 'label', fname), clear_color(ref_img))
-        plt.imsave(os.path.join(out_path, 'recon', fname), clear_color(sample))
+        input_arr = clear_color(y_n)
+        label_arr = clear_color(ref_img)
+        recon_arr = clear_color(sample)
+
+        # save numpy arrays
+        fname = str(i).zfill(5) + '.npy'
+        np.save(os.path.join(out_path, 'input', fname), input_arr)
+        np.save(os.path.join(out_path, 'label', fname), label_arr)
+        np.save(os.path.join(out_path, 'recon', fname), recon_arr)
+
+        # save images
+        fname = str(i).zfill(5) + '.png'
+        plt.imsave(os.path.join(out_path, 'input', fname), input_arr)
+        plt.imsave(os.path.join(out_path, 'label', fname), label_arr)
+        plt.imsave(os.path.join(out_path, 'recon', fname), recon_arr)
 
 if __name__ == '__main__':
+    import sys
+    
+    sys.argv = [
+        "script.py",
+        "--model_config", "configs/imagenet_model_config.yaml",
+        "--diffusion_config", "configs/diffusion_config.yaml",
+        "--task_config", "configs/gaussian_deblur_config.yaml"
+    ]
     main()
