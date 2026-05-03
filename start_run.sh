@@ -2,7 +2,9 @@
 
 N=2  # number of jobs you want to launch
 
-BASE_JOBID="imagenet"
+DATANAME="imagenet"
+OPERTORNAME="inpainting"
+BASE_JOBID="${DATANAME}/${OPERTORNAME}"
 
 REPO_DIR="/rds/general/user/mm3218/home/git/diffusion-posterior-sampling"
 SAVE_DIR="/rds/general/user/mm3218/home/projects/2026/dps_sbc/${BASE_JOBID}"
