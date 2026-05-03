@@ -61,7 +61,9 @@ def main():
     # Prepare Operator and noise
     measure_config = task_config['measurement']
     operator = get_operator(device=device, **measure_config['operator'])
+    operator.seed = 42
     noiser = get_noise(**measure_config['noise'])
+    noiser.seed = 42
     logger.info(f"Operation: {measure_config['operator']['name']} / Noise: {measure_config['noise']['name']}")
 
     # Prepare conditioning method
@@ -102,8 +104,8 @@ def main():
         start_time = time.time()
         logger.info(f"Inference for image {i}")
         ref_img = ref_img.to(device)
-        operator.seed = 42
-        noiser.seed = 42
+        operator.seed += 1
+        noiser.seed += 1
 
         # Exception) In case of inpainging,
         if measure_config['operator'] ['name'] == 'inpainting':
