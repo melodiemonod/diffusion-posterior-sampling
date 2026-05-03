@@ -10,7 +10,7 @@ SAVE_DIR="/rds/general/user/mm3218/home/projects/2026/dps_sbc/${BASE_JOBID}"
 data_config=$REPO_DIR/configs/imagenet_data_config.yaml
 model_config=$REPO_DIR/configs/imagenet_model_config.yaml
 diffusion_config=$REPO_DIR/configs/diffusion_config.yaml
-task_config=$REPO_DIR/configs/nonlinear_deblur_config.yaml
+task_config=$REPO_DIR/configs/inpainting_config.yaml
 
 mkdir -p $SAVE_DIR
 
@@ -52,6 +52,7 @@ python3 \$REPO_DIR/sample_condition.py \\
 EOF
 
     chmod +x $job_script
+    cd $job_dir
     qsub $job_script
 
     echo "Submitted job $jobid"
