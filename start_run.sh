@@ -20,7 +20,6 @@ TEMPLATE_FILE="run_template.pbs"
 
 for i in $(seq 1 $N); do
     
-    mkdir -p pbs_jobs
     job_dir=${SAVE_DIR}/run_${i}
     job_script="${job_dir}/run_${i}.pbs"
     mkdir -p $job_dir
