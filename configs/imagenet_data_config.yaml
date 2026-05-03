@@ -1,0 +1,4 @@
+name: imagenet
+root: /Users/Monod/data/imagenet/train
+num_samples: 999
+seed: 42

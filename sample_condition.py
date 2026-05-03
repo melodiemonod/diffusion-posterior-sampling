@@ -2,6 +2,7 @@ from functools import partial
 import os
 import argparse
 import time
+from PIL import Image
 import yaml
 import numpy as np
 import torch
@@ -25,6 +26,7 @@ def load_yaml(file_path: str) -> dict:
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--data_config', type=str)
     parser.add_argument('--model_config', type=str)
     parser.add_argument('--diffusion_config', type=str)
     parser.add_argument('--task_config', type=str)
@@ -46,6 +48,7 @@ def main():
     model_config = load_yaml(args.model_config)
     diffusion_config = load_yaml(args.diffusion_config)
     task_config = load_yaml(args.task_config)
+    data_config = load_yaml(args.data_config)
    
     #assert model_config['learn_sigma'] == diffusion_config['learn_sigma'], \
     #"learn_sigma must be the same for model and diffusion configuartion."
@@ -78,9 +81,13 @@ def main():
         os.makedirs(os.path.join(out_path, img_dir), exist_ok=True)
 
     # Prepare dataloader
-    data_config = task_config['data']
-    transform = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    transform = transforms.Compose([
+            transforms.Resize(256, interpolation=Image.BICUBIC),
+            transforms.CenterCrop(256),   # optional but commonly included
+            transforms.ToTensor(),
+            transforms.Normalize([0.5, 0.5, 0.5],
+                                [0.5, 0.5, 0.5]),
+        ])
     dataset = get_dataset(**data_config, transforms=transform)
     loader = get_dataloader(dataset, batch_size=1, num_workers=0, train=False)
 
@@ -137,6 +144,9 @@ def main():
         end_time = time.time()
         elapsed = end_time - start_time
         print(f"Time per image {i}: {elapsed:.2f} sec")
+        
+        if i >= data_config['num_samples'] - 1:
+            break
     
 if __name__ == '__main__':
     main()

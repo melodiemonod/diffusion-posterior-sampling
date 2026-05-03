@@ -1,0 +1,10 @@
+.DS_Store
+.vscode/
+__pycache__/
+bkse/
+*/.DS_Store
+*/__pycache__/
+test.py
+test_sample_condition.py
+models/
+motionblur/

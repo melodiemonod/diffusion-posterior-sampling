@@ -3,10 +3,6 @@ conditioning:
   params:
     scale: 0.5
 
-data:
-  name: ffhq
-  root: ./data/samples/
-
 measurement:
   operator:
     name: inpainting
