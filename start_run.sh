@@ -25,7 +25,7 @@ for i in $(seq 1 $N); do
 
     cat > $job_script <<EOF
 #!/bin/sh
-#PBS -N dps_${BASE_JOBID}_${i}
+#PBS -N dps_${i}
 #PBS -l walltime=72:00:00
 #PBS -l select=1:ncpus=1:mem=100gb:ngpus=1
 #PBS -j oe
