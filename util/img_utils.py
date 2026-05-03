@@ -3,6 +3,8 @@ import torch
 import scipy
 import torch.nn.functional as F
 from torch import nn
+from contextlib import contextmanager
+
 from torch.autograd import Variable
 import matplotlib.pyplot as plt
 from motionblur.motionblur import Kernel
@@ -35,6 +37,22 @@ def ifft2_m(x):
   if not torch.is_complex(x):
       x = x.type(torch.complex64)
   return torch.view_as_complex(ifft2c_new(torch.view_as_real(x)))
+
+
+@contextmanager
+def temp_seed(seed):
+    if seed is None:
+        yield
+        return
+
+    # numpy
+    state = np.random.get_state()
+    np.random.seed(seed)
+    
+    try:
+        yield
+    finally:
+        np.random.set_state(state)
 
 
 def clear(x):
@@ -215,17 +233,18 @@ class mask_generator:
         mask[:, ...] = mask_b
         return mask
 
-    def __call__(self, img):
-        if self.mask_type == 'random':
-            mask = self._retrieve_random(img)
-            return mask
-        elif self.mask_type == 'box':
-            mask, t, th, w, wl = self._retrieve_box(img)
-            return mask
-        elif self.mask_type == 'extreme':
-            mask, t, th, w, wl = self._retrieve_box(img)
-            mask = 1. - mask
-            return mask
+    def __call__(self, img, seed):
+        with temp_seed(seed):
+            if self.mask_type == 'random':
+                mask = self._retrieve_random(img)
+                return mask
+            elif self.mask_type == 'box':
+                mask, t, th, w, wl = self._retrieve_box(img)
+                return mask
+            elif self.mask_type == 'extreme':
+                mask, t, th, w, wl = self._retrieve_box(img)
+                mask = 1. - mask
+                return mask
 
 def unnormalize(img, s=0.95):
     scaling = torch.quantile(img.abs(), s)
