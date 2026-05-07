@@ -1,2 +1,4 @@
 name: ffhq
-root: ./data/samples/
+root: /Users/Monod/git/diffusion-posterior-sampling/data/samples
+num_samples: 3
+seed: 42
