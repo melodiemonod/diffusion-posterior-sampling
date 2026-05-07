@@ -31,7 +31,7 @@ for i in $(seq 1 $N); do
 #PBS -l select=1:ncpus=1:mem=100gb:ngpus=1
 #PBS -j oe
 
-eval "$(/gpfs/home/mm3218/miniforge3/bin/conda shell.bash hook)"
+eval "\$(/gpfs/home/mm3218/miniforge3/bin/conda shell.bash hook)"
 conda activate DPS
 
 REPO_DIR="$REPO_DIR"
