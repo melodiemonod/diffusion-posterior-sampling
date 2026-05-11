@@ -101,6 +101,13 @@ def main():
         
     # Do Inference
     for i, ref_img in enumerate(loader):
+        
+        # check if the image is already processed
+        fname = str(i).zfill(5) + '.npy'
+        if os.path.exists(os.path.join(out_path, 'input', fname)):
+            logger.info(f"Image {i} already exists. Skipping...")
+            continue
+        
         start_time = time.time()
         logger.info(f"Inference for image {i}")
         ref_img = ref_img.to(device)
@@ -132,13 +139,11 @@ def main():
         recon_arr = clear_color(sample)
 
         # save numpy arrays
-        fname = str(i).zfill(5) + '.npy'
         np.save(os.path.join(out_path, 'input', fname), input_arr)
         np.save(os.path.join(out_path, 'label', fname), label_arr)
         np.save(os.path.join(out_path, 'recon', fname), recon_arr)
 
         # save images
-        fname = str(i).zfill(5) + '.png'
         plt.imsave(os.path.join(out_path, 'input', fname), input_arr)
         plt.imsave(os.path.join(out_path, 'label', fname), label_arr)
         plt.imsave(os.path.join(out_path, 'recon', fname), recon_arr)
