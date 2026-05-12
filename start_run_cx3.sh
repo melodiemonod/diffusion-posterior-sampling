@@ -6,7 +6,7 @@ DATANAME="imagenet"
 OPERTORNAME="inpainting"
 BASE_JOBID="${DATANAME}/${OPERTORNAME}"
 
-REPO_DIR="rds/general/user/mm3218/home/git/diffusion-posterior-sampling"
+REPO_DIR="/rds/general/user/mm3218/home/git/diffusion-posterior-sampling"
 SAVE_DIR="/rds/general/user/mm3218/home/projects/2026/dps_sbc/${BASE_JOBID}"
 
 data_config=$REPO_DIR/configs/imagenet_data_config.yaml
