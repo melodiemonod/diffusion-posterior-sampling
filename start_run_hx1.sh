@@ -1,6 +1,6 @@
 #!/bin/bash
 
-N=2  # number of jobs you want to launch
+N=200  # number of jobs you want to launch
 
 DATANAME="imagenet"
 OPERTORNAME="inpainting"
@@ -53,9 +53,59 @@ python3 \$REPO_DIR/sample_condition.py \\
 EOF
 
     chmod +x $job_script
-    cd $job_dir
-    qsub $job_script
-
-    echo "Submitted job $jobid"
-
+    
 done
+
+
+for i in $(seq 1 $((N / 50))); do
+    start_index=$(( (i - 1) * 50 + 1 ))
+    end_index=$(( i * 50 ))
+
+    job_script="${SAVE_DIR}/run_${start_index}-${end_index}.pbs"
+
+    cat > $job_script <<EOF
+#!/bin/sh
+#PBS -N dps_${start_index}-${end_index}
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=1:mem=100gb:ngpus=1
+#PBS -J ${start_index}-${end_index}
+#PBS -j oe
+
+eval "\$(/gpfs/home/mm3218/miniforge3/bin/conda shell.bash hook)"
+conda activate DPS
+
+DATANAME="ffhq"
+OPERTORNAME="inpainting"
+BASE_JOBID="${DATANAME}/${OPERTORNAME}"
+
+REPO_DIR="/gpfs/home/mm3218/git/diffusion-posterior-sampling"
+SAVE_DIR="/gpfs/home/mm3218/projects/2026/dps_sbc/${OPERATORNAME}_${PBS_ARRAY_INDEX}"
+
+data_config=$REPO_DIR/configs/ffhq_data_config.yaml
+model_config=$REPO_DIR/configs/ffhq_model_config.yaml
+diffusion_config=$REPO_DIR/configs/diffusion_config.yaml
+task_config=$REPO_DIR/configs/inpainting_config.yaml
+
+save_dir="$job_dir"
+
+cd $REPO_DIR
+python3 $REPO_DIR/sample_condition.py \
+  --data_config=$data_config \
+  --model_config=$model_config \
+  --diffusion_config=$diffusion_config \
+  --task_config=$task_config \
+  --gpu=0 \
+  --save_dir=$save_dir
+EOF
+
+    chmod +x $job_script
+    if i == 1; then
+        echo "cd $SAVE_DIR"
+        echo "qsub $job_script"
+    else
+        echo "qsub -W depend=afterany:12345 $job_script"
+    fi
+    
+done
+
+
