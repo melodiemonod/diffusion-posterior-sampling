@@ -99,11 +99,12 @@ python3 $REPO_DIR/sample_condition.py \
 EOF
 
     chmod +x $job_script
+    job_name=$(basename "$job_script")
     if [ "$i" -eq 1 ]; then
         echo "cd $SAVE_DIR"
-        echo "qsub $job_script"
+        echo "qsub $job_name"
     else
-        echo "qsub -W depend=afterany:12345 $job_script"
+        echo "qsub -W depend=afterany:12345 $job_name"
     fi
     
 done
