@@ -50,9 +50,6 @@ def main():
     task_config = load_yaml(args.task_config)
     data_config = load_yaml(args.data_config)
    
-    #assert model_config['learn_sigma'] == diffusion_config['learn_sigma'], \
-    #"learn_sigma must be the same for model and diffusion configuartion."
-    
     # Load model
     model = create_model(**model_config)
     model = model.to(device)
@@ -101,6 +98,8 @@ def main():
         
     # Do Inference
     for i, ref_img in enumerate(loader):
+
+        print(f"Processing image {i} / {len(loader)}")
         
         # check if the image is already processed
         fname = str(i).zfill(5) + '.npy'
@@ -139,11 +138,13 @@ def main():
         recon_arr = clear_color(sample)
 
         # save numpy arrays
+        fname = str(i).zfill(5) + '.npy'
         np.save(os.path.join(out_path, 'input', fname), input_arr)
         np.save(os.path.join(out_path, 'label', fname), label_arr)
         np.save(os.path.join(out_path, 'recon', fname), recon_arr)
 
         # save images
+        fname = str(i).zfill(5) + '.png'
         plt.imsave(os.path.join(out_path, 'input', fname), input_arr)
         plt.imsave(os.path.join(out_path, 'label', fname), label_arr)
         plt.imsave(os.path.join(out_path, 'recon', fname), recon_arr)
