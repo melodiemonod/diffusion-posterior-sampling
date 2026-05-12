@@ -80,7 +80,7 @@ model_config="$model_config"
 diffusion_config="$diffusion_config"
 task_config="$task_config"
 
-save_dir=${SAVE_DIR}/run_${PBS_ARRAY_INDEX}
+save_dir=${SAVE_DIR}/run_\${PBS_ARRAY_INDEX}
 
 cd \$REPO_DIR
 python3 \$REPO_DIR/sample_condition.py \
