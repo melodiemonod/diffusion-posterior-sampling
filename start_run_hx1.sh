@@ -74,28 +74,22 @@ for i in $(seq 1 $((N / 50))); do
 eval "\$(/gpfs/home/mm3218/miniforge3/bin/conda shell.bash hook)"
 conda activate DPS
 
-DATANAME="ffhq"
-OPERTORNAME="inpainting"
-BASE_JOBID="${DATANAME}/${OPERTORNAME}"
+REPO_DIR="$REPO_DIR"
+data_config="$data_config"
+model_config="$model_config"
+diffusion_config="$diffusion_config"
+task_config="$task_config"
 
-REPO_DIR="/gpfs/home/mm3218/git/diffusion-posterior-sampling"
-SAVE_DIR="/gpfs/home/mm3218/projects/2026/dps_sbc/${OPERATORNAME}_${PBS_ARRAY_INDEX}"
+save_dir=${SAVE_DIR}/run_${PBS_ARRAY_INDEX}
 
-data_config=$REPO_DIR/configs/ffhq_data_config.yaml
-model_config=$REPO_DIR/configs/ffhq_model_config.yaml
-diffusion_config=$REPO_DIR/configs/diffusion_config.yaml
-task_config=$REPO_DIR/configs/inpainting_config.yaml
-
-save_dir="$job_dir"
-
-cd $REPO_DIR
-python3 $REPO_DIR/sample_condition.py \
-  --data_config=$data_config \
-  --model_config=$model_config \
-  --diffusion_config=$diffusion_config \
-  --task_config=$task_config \
+cd \$REPO_DIR
+python3 \$REPO_DIR/sample_condition.py \
+  --data_config=\$data_config \
+  --model_config=\$model_config \
+  --diffusion_config=\$diffusion_config \
+  --task_config=\$task_config \
   --gpu=0 \
-  --save_dir=$save_dir
+  --save_dir=\$save_dir
 EOF
 
     chmod +x $job_script
