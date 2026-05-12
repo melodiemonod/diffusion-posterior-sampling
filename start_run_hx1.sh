@@ -99,7 +99,7 @@ python3 $REPO_DIR/sample_condition.py \
 EOF
 
     chmod +x $job_script
-    if i == 1; then
+    if [ "$i" -eq 1 ]; then
         echo "cd $SAVE_DIR"
         echo "qsub $job_script"
     else
