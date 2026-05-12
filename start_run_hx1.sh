@@ -2,15 +2,15 @@
 
 N=200  # number of jobs you want to launch
 
-DATANAME="imagenet"
+DATANAME="ffhq"
 OPERTORNAME="inpainting"
 BASE_JOBID="${DATANAME}/${OPERTORNAME}"
 
 REPO_DIR="/gpfs/home/mm3218/git/diffusion-posterior-sampling"
 SAVE_DIR="/gpfs/home/mm3218/projects/2026/dps_sbc/${BASE_JOBID}"
 
-data_config=$REPO_DIR/configs/imagenet_data_config.yaml
-model_config=$REPO_DIR/configs/imagenet_model_config.yaml
+data_config=$REPO_DIR/configs/ffhq_data_config.yaml
+model_config=$REPO_DIR/configs/ffhq_model_config.yaml
 diffusion_config=$REPO_DIR/configs/diffusion_config.yaml
 task_config=$REPO_DIR/configs/inpainting_config.yaml
 
