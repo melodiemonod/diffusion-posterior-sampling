@@ -61,7 +61,7 @@ for i in $(seq 1 $((N / 50))); do
     start_index=$(( (i - 1) * 50 + 1 ))
     end_index=$(( i * 50 ))
 
-    job_script="${SAVE_DIR}/run_${start_index}-${end_index}.pbs"
+    job_script="job_${SAVE_DIR}/run_${start_index}-${end_index}.pbs"
 
     cat > $job_script <<EOF
 #!/bin/sh
